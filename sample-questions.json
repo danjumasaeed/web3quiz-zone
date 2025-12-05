@@ -1,0 +1,22 @@
+{
+  "title": "Sample Web3Quiz",
+  "description": "A short demo quiz about web3 basics.",
+  "questions": [
+    {
+      "id": 1,
+      "question": "What does EVM stand for?",
+      "options": ["Ethereum Virtual Machine", "Encrypted Value Mapping", "External Variable Manager", "Ether Vault Manager"]
+    },
+    {
+      "id": 2,
+      "question": "Which function is used to send ETH in Solidity safely?",
+      "options": ["transfer()", "send()", "call{value:...}()", "push()"]
+    },
+    {
+      "id": 3,
+      "question": "Which standard is ERC-20?",
+      "options": ["Token interface", "Storage standard", "Consensus protocol", "Wallet spec"]
+    }
+  ],
+  "answersExampleFormat": "Q1:A|Q2:C|Q3:A"
+}

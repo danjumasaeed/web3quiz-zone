@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Web3Quiz Zone</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Web3Quiz Zone</h1>
+    <div id="wallet">
+      <button id="connectBtn">Connect Wallet</button>
+      <span id="addr"></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel" id="createPanel">
+      <h2>Create Campaign (Admin)</h2>
+      <form id="createForm">
+        <label>Title: <input name="title" required /></label>
+        <label>Metadata JSON URL (questions): <input name="metadataURI" value="http://localhost:3000/examples/questions/sample-questions.json" /></label>
+        <label>Theme color: <input name="theme" type="color" value="#2b6cb0" /></label>
+        <label>Token (address or 0x000..0 for ETH): <input name="token" value="0x0000000000000000000000000000000000000000" /></label>
+        <label>Passing Score (percentage): <input name="passingScore" type="number" value="70" /></label>
+        <label>Prize per winner (in ETH or token units): <input name="prize" value="0.01" /></label>
+        <button type="submit">Create Campaign</button>
+      </form>
+      <div id="createStatus"></div>
+    </section>
+
+    <section class="panel" id="campaignsPanel">
+      <h2>Campaigns</h2>
+      <div id="campaignList">Loading campaigns...</div>
+    </section>
+
+    <section class="panel" id="campaignDetail" style="display:none">
+      <h2 id="campTitle">Campaign</h2>
+      <div id="campMeta"></div>
+      <div id="questionArea"></div>
+      <div id="quizActions"></div>
+    </section>
+  </main>
+
+  <footer>
+    <small>Demo: option A (on-chain hash) and option B (admin-signed). See docs for security notes.</small>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

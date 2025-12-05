@@ -1,0 +1,43 @@
+:root {
+  --bg: #0f172a;
+  --panel: #0b1220;
+  --text: #e6eef8;
+  --accent: #2b6cb0;
+}
+
+* { box-sizing: border-box; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #071029 0%, #071a2c 100%);
+  color: var(--text);
+  padding: 16px;
+}
+header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom: 16px;
+}
+h1 { margin: 0; font-size: 20px; color: var(--accent); }
+.panel {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.03);
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+label { display:block; margin:6px 0; font-size:14px; color:#cfe6ff; }
+input, select, button {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+}
+button { cursor:pointer; background: var(--accent); color: #fff; border: none; }
+#campaignList { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+.campaignCard { padding:12px; border-radius:8px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); }
+.campaignCard h3 { margin:0 0 6px 0; font-size:16px; }
+.small { font-size:12px; color:#a9c7e6; }
+.question { margin-bottom:10px; padding:8px; background: rgba(255,255,255,0.01); border-radius:6px; }
+.option { display:block; margin:6px 0; }
+footer { margin-top: 18px; color:#7696b8; font-size:13px; }
