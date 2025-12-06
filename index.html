@@ -2,52 +2,98 @@
 <html>
 <head>
   <meta charset="utf-8" />
-  <title>Web3Quiz Zone</title>
+  <title>QuizPad – Web3 Quiz Launchpad</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <header>
-    <h1>Web3Quiz Zone</h1>
-    <div id="wallet">
-      <button id="connectBtn">Connect Wallet</button>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo-area">
+      <img src="logo.png" alt="QuizPad" class="logo"/>
+      <h1>QuizPad</h1>
+    </div>
+
+    <div id="wallet" class="wallet-box">
+      <button id="connectBtn" class="wallet-btn">Connect Wallet</button>
       <span id="addr"></span>
     </div>
   </header>
 
-  <main>
+
+  <!-- MAIN LAYOUT -->
+  <main class="container">
+
+    <!-- CREATE CAMPAIGN PANEL -->
     <section class="panel" id="createPanel">
-      <h2>Create Campaign (Admin)</h2>
-      <form id="createForm">
-        <label>Title: <input name="title" required /></label>
-        <label>Metadata JSON URL (questions): <input name="metadataURI" value="http://localhost:3000/examples/questions/sample-questions.json" /></label>
-        <label>Theme color: <input name="theme" type="color" value="#2b6cb0" /></label>
-        <label>Token (address or 0x000..0 for ETH): <input name="token" value="0x0000000000000000000000000000000000000000" /></label>
-        <label>Passing Score (percentage): <input name="passingScore" type="number" value="70" /></label>
-        <label>Prize per winner (in ETH or token units): <input name="prize" value="0.01" /></label>
-        <button type="submit">Create Campaign</button>
+      <h2 class="panel-title">Create Quiz Campaign</h2>
+
+      <form id="createForm" class="form">
+
+        <label class="form-label">Campaign Title
+          <input class="form-input" name="title" required />
+        </label>
+
+        <label class="form-label">Metadata JSON URL (questions)
+          <input class="form-input" name="metadataURI"
+            value="http://localhost:3000/examples/questions/sample-questions.json" />
+        </label>
+
+        <label class="form-label">Theme Color
+          <input class="form-input" name="theme" type="color" value="#2b6cb0" />
+        </label>
+
+        <label class="form-label">Reward Token Address
+          <input class="form-input" name="token"
+            value="0x0000000000000000000000000000000000000000" />
+        </label>
+
+        <label class="form-label">Passing Score (%)
+          <input class="form-input" name="passingScore" type="number" value="70" />
+        </label>
+
+        <label class="form-label">Prize Per Winner
+          <input class="form-input" name="prize" value="0.01" />
+        </label>
+
+        <button type="submit" class="primary-btn">Publish Campaign</button>
       </form>
-      <div id="createStatus"></div>
+
+      <div id="createStatus" class="status-box"></div>
     </section>
 
+
+    <!-- CAMPAIGN LIST -->
     <section class="panel" id="campaignsPanel">
-      <h2>Campaigns</h2>
-      <div id="campaignList">Loading campaigns...</div>
+      <h2 class="panel-title">Active Campaigns</h2>
+      <div id="campaignList" class="campaign-list">Loading campaigns...</div>
     </section>
 
+
+    <!-- CAMPAIGN DETAIL -->
     <section class="panel" id="campaignDetail" style="display:none">
-      <h2 id="campTitle">Campaign</h2>
-      <div id="campMeta"></div>
-      <div id="questionArea"></div>
-      <div id="quizActions"></div>
+      <h2 id="campTitle" class="panel-title">Campaign</h2>
+
+      <div id="campMeta" class="meta-box"></div>
+
+      <div id="questionArea" class="questions-box"></div>
+
+      <div id="quizActions" class="actions-box"></div>
     </section>
+
   </main>
 
-  <footer>
-    <small>Demo: option A (on-chain hash) and option B (admin-signed). See docs for security notes.</small>
+  <footer class="footer">
+    <small>QuizPad – Web3 Quiz Launchpad • All campaigns are created & verified by project owners.</small>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
   <script src="app.js"></script>
+
 </body>
 </html>
