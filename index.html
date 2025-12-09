@@ -1,99 +1,477 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>QuizPad – Web3 Quiz Launchpad</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>QuizPad – Web3 Quiz Launchpad</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Ethers.js -->
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
 
-  <link rel="stylesheet" href="styles.css" />
+    <style>
+        /* Custom styles for dark theme and typography */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A; /* Slate 900 */
+            color: #E5E7EB;
+        }
+        /* Custom utility classes */
+        .card {
+            background-color: #1E293B; /* Slate 800 */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+        .btn-primary {
+            @apply px-6 py-3 font-bold text-white bg-indigo-600 rounded-xl shadow-lg hover:bg-indigo-500 transition duration-150 ease-in-out;
+        }
+        .btn-secondary {
+            @apply px-3 py-1 font-semibold text-xs text-gray-200 bg-gray-600 rounded-lg hover:bg-gray-500 transition duration-150 ease-in-out;
+        }
+        .form-input {
+            @apply w-full p-3 mt-1 text-gray-100 bg-slate-700 border border-slate-600 rounded-lg focus:ring-indigo-500 focus:border-indigo-500;
+        }
+        .form-label {
+            @apply block mb-4 font-medium text-slate-300;
+        }
+        .panel-title {
+            @apply text-2xl font-bold mb-6 text-indigo-400 border-b border-slate-700 pb-3;
+        }
+        .option-label {
+            @apply block cursor-pointer p-3 my-2 border border-slate-700 rounded-lg transition duration-150 ease-in-out hover:bg-slate-700;
+        }
+        input[type="radio"]:checked + .option-label {
+            @apply bg-indigo-700 border-indigo-500;
+        }
+        input[type="radio"] {
+            display: none;
+        }
+    </style>
 </head>
-<body>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="logo-area">
-      <img src="logo.png" alt="QuizPad" class="logo"/>
-      <h1>QuizPad</h1>
-    </div>
+<body class="p-4 sm:p-8 min-h-screen">
 
-    <div id="wallet" class="wallet-box">
-      <button id="connectBtn" class="wallet-btn">Connect Wallet</button>
-      <span id="addr"></span>
-    </div>
-  </header>
+    <!-- HEADER -->
+    <header class="flex flex-col sm:flex-row justify-between items-center p-4 mb-8 card rounded-xl">
+        <div class="flex items-center space-x-3 logo-area">
+            <!-- Replaced logo.png with a text/icon logo -->
+            <span class="text-4xl" role="img" aria-label="Brain Icon">🧠</span> 
+            <h1 class="text-3xl font-extrabold text-indigo-400">QuizPad</h1>
+        </div>
 
-
-  <!-- MAIN LAYOUT -->
-  <main class="container">
-
-    <!-- CREATE CAMPAIGN PANEL -->
-    <section class="panel" id="createPanel">
-      <h2 class="panel-title">Create Quiz Campaign</h2>
-
-      <form id="createForm" class="form">
-
-        <label class="form-label">Campaign Title
-          <input class="form-input" name="title" required />
-        </label>
-
-        <label class="form-label">Metadata JSON URL (questions)
-          <input class="form-input" name="metadataURI"
-            value="http://localhost:3000/examples/questions/sample-questions.json" />
-        </label>
-
-        <label class="form-label">Theme Color
-          <input class="form-input" name="theme" type="color" value="#2b6cb0" />
-        </label>
-
-        <label class="form-label">Reward Token Address
-          <input class="form-input" name="token"
-            value="0x0000000000000000000000000000000000000000" />
-        </label>
-
-        <label class="form-label">Passing Score (%)
-          <input class="form-input" name="passingScore" type="number" value="70" />
-        </label>
-
-        <label class="form-label">Prize Per Winner
-          <input class="form-input" name="prize" value="0.01" />
-        </label>
-
-        <button type="submit" class="primary-btn">Publish Campaign</button>
-      </form>
-
-      <div id="createStatus" class="status-box"></div>
-    </section>
+        <div id="wallet" class="flex items-center space-x-3 wallet-box mt-4 sm:mt-0">
+            <span id="addr" class="text-sm font-mono text-gray-400 truncate">Wallet Not Connected</span>
+            <button id="connectBtn" class="btn-primary py-2 px-4 text-sm">Connect Wallet</button>
+        </div>
+    </header>
 
 
-    <!-- CAMPAIGN LIST -->
-    <section class="panel" id="campaignsPanel">
-      <h2 class="panel-title">Active Campaigns</h2>
-      <div id="campaignList" class="campaign-list">Loading campaigns...</div>
-    </section>
+    <!-- MAIN LAYOUT -->
+    <main class="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- CREATE CAMPAIGN PANEL (Column 1) -->
+        <section class="lg:col-span-1 card p-6 rounded-xl h-fit" id="createPanel">
+            <h2 class="panel-title">Create Quiz Campaign</h2>
+
+            <form id="createForm" class="form">
+                <label class="form-label">Campaign Title
+                    <input class="form-input" name="title" required />
+                </label>
+
+                <label class="form-label">Metadata JSON URL (questions)
+                    <input class="form-input" name="metadataURI"
+                        value="http://localhost:3000/examples/questions/sample-questions.json" required />
+                </label>
+
+                <label class="form-label">Theme Color (For display only)
+                    <input class="form-input" name="theme" type="color" value="#2b6cb0" />
+                </label>
+
+                <label class="form-label">Reward Token Address (0x0 for ETH)
+                    <input class="form-input" name="token"
+                        value="0x0000000000000000000000000000000000000000" required />
+                </label>
+
+                <label class="form-label">Passing Score (%)
+                    <input class="form-input" name="passingScore" type="number" min="0" max="100" value="70" required />
+                </label>
+
+                <label class="form-label">Prize Per Winner (in ETH/Tokens)
+                    <input class="form-input" name="prize" type="number" step="any" value="0.01" required />
+                </label>
+
+                <button type="submit" class="btn-primary w-full mt-4">Publish Campaign</button>
+            </form>
+
+            <div id="createStatus" class="status-box mt-4 text-sm text-yellow-400"></div>
+        </section>
 
 
-    <!-- CAMPAIGN DETAIL -->
-    <section class="panel" id="campaignDetail" style="display:none">
-      <h2 id="campTitle" class="panel-title">Campaign</h2>
+        <!-- CAMPAIGN LIST & DETAIL (Columns 2 & 3) -->
+        <div class="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
 
-      <div id="campMeta" class="meta-box"></div>
+            <!-- CAMPAIGN LIST -->
+            <section class="md:col-span-1 card p-6 rounded-xl h-fit" id="campaignsPanel">
+                <h2 class="panel-title">Active Campaigns</h2>
+                <div id="campaignList" class="campaign-list space-y-3">
+                    <div class="text-center text-gray-400 py-8">Loading campaigns...</div>
+                </div>
+            </section>
 
-      <div id="questionArea" class="questions-box"></div>
 
-      <div id="quizActions" class="actions-box"></div>
-    </section>
+            <!-- CAMPAIGN DETAIL (Quiz/Claim Area) -->
+            <section class="md:col-span-1 card p-6 rounded-xl h-fit" id="campaignDetail" style="display:none">
+                <h2 id="campTitle" class="panel-title">Campaign Details</h2>
 
-  </main>
+                <div id="campMeta" class="meta-box mb-4 space-y-1 text-gray-400"></div>
 
-  <footer class="footer">
-    <small>QuizPad – Web3 Quiz Launchpad • All campaigns are created & verified by project owners.</small>
-  </footer>
+                <div id="questionArea" class="questions-box space-y-4">
+                    <div class="text-center text-gray-400">Select a campaign to load quiz data.</div>
+                </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@6.9.0/dist/ethers.umd.min.js"></script>
-  <script src="app.js"></script>
+                <div id="quizActions" class="actions-box mt-6">
+                    <!-- Actions will be rendered here by JS -->
+                </div>
+            </section>
 
+        </div>
+
+    </main>
+
+    <footer class="text-center mt-12 text-slate-500 text-xs">
+        <small>QuizPad – Web3 Quiz Launchpad • All campaigns are created & verified by project owners.</small>
+    </footer>
+
+    <!-- EMBEDDED JAVASCRIPT LOGIC -->
+    <script>
+        // Frontend minimal JS to interact with factory & campaigns
+        
+        // Use ethers global variable for convenience
+        const ethers = window.ethers; 
+
+        // Helper function for user-friendly message boxes instead of alert()/prompt()
+        function showMessage(message, isError = false) {
+            const statusEl = document.getElementById("createStatus");
+            statusEl.textContent = message;
+            statusEl.className = isError ? "mt-4 text-sm text-red-400" : "mt-4 text-sm text-green-400";
+        }
+        
+        // Simple custom prompt/modal simulation
+        function customPrompt(title, message, defaultValue) {
+            return new Promise((resolve) => {
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
+                modal.innerHTML = `
+                    <div class="bg-slate-800 p-6 rounded-xl w-full max-w-sm m-4">
+                        <h3 class="text-xl font-bold mb-4 text-indigo-300">${title}</h3>
+                        <p class="mb-4 text-slate-300">${message}</p>
+                        <input type="text" id="modalInput" value="${defaultValue || ''}" class="form-input" required />
+                        <div class="flex justify-end space-x-4 mt-4">
+                            <button id="modalCancel" class="btn-secondary py-2 px-4">Cancel</button>
+                            <button id="modalConfirm" class="btn-primary py-2 px-4">Submit</button>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+                const input = document.getElementById('modalInput');
+                input.focus();
+
+                document.getElementById('modalConfirm').onclick = () => {
+                    document.body.removeChild(modal);
+                    resolve(input.value);
+                };
+                document.getElementById('modalCancel').onclick = () => {
+                    document.body.removeChild(modal);
+                    resolve(null);
+                };
+            });
+        }
+
+
+        (async () => {
+        
+            // Load config to get factory address
+            let factoryAddress = null;
+            try {
+                // Fetch config.json which is expected to be written by the deployment script
+                const cfgResp = await fetch("config.json");
+                const cfg = await cfgResp.json();
+                factoryAddress = cfg.factoryAddress;
+                showMessage(`Factory: ${factoryAddress.slice(0, 8)}...`, false);
+            } catch (err) {
+                console.warn("Could not load frontend/config.json. Assuming local deployment environment.", err);
+                showMessage("Warning: Factory address not configured. Deploy contracts first.", true);
+            }
+
+            // Fallback provider (Hardhat default)
+            const provider = new ethers.BrowserProvider(window.ethereum || new ethers.JsonRpcProvider("http://127.0.0.1:8545"));
+            let signer;
+            let userAddress;
+
+            // ABI excerpts (minimal)
+            const factoryAbi = [
+                "function getCampaigns() view returns (address[])",
+                "function createCampaign(address admin,string title,string metadataURI,address tokenAddressOrZeroForETH,uint256 passingScore,uint256 prizePerWinner) returns (address)",
+                "event CampaignCreated(address indexed campaignAddress, address indexed admin, string title)"
+            ];
+            const campaignAbi = [
+                "function admin() view returns (address)",
+                "function metadataURI() view returns (string)",
+                "function token() view returns (address)",
+                "function prizePerWinner() view returns (uint256)",
+                "function getBalance() view returns (uint256)",
+                "function claimWithAnswersHash(bytes32) payable",
+                "function claimWithSignature(bytes)",
+                "function setAnswersHash(bytes32)",
+                "function fund() payable",
+                "function fundERC20(uint256)"
+            ];
+
+            // Helper to format address display
+            function short(addr) { return addr ? addr.slice(0,6) + "..." + addr.slice(-4) : ""; }
+
+            // Connect wallet
+            document.getElementById("connectBtn").addEventListener("click", async () => {
+                try {
+                    await provider.send("eth_requestAccounts", []);
+                    signer = await provider.getSigner();
+                    userAddress = await signer.getAddress();
+                    document.getElementById("addr").textContent = short(userAddress);
+                    document.getElementById("connectBtn").textContent = "Connected";
+                    document.getElementById("connectBtn").disabled = true;
+                    refreshCampaigns();
+                } catch (error) {
+                    console.error("Wallet connection failed:", error);
+                    showMessage("Wallet connection failed. Check MetaMask/Wallet extension.", true);
+                }
+            });
+
+            // Create campaign
+            document.getElementById("createForm").addEventListener("submit", async (e) => {
+                e.preventDefault();
+                if (!signer) return showMessage("Connect wallet first", true);
+                if (!factoryAddress) return showMessage("Factory address not configured. Deploy first.", true);
+
+                const form = e.target;
+                const title = form.title.value;
+                const metadataURI = form.metadataURI.value;
+                const token = form.token.value;
+                const passingScore = parseInt(form.passingScore.value);
+                const prizeRaw = form.prize.value;
+                
+                let prize;
+                try {
+                    // Use parseEther for simplicity, assuming 18 decimals for most tokens/ETH
+                    prize = ethers.parseEther(prizeRaw); 
+                } catch (err) {
+                    return showMessage("Invalid prize amount format. Ensure it's a number.", true);
+                }
+
+
+                const factory = new ethers.Contract(factoryAddress, factoryAbi, signer);
+                try {
+                    showMessage("Creating campaign... please confirm transaction.", false);
+                    // The admin address is the user's address who calls the factory
+                    const tx = await factory.createCampaign(userAddress, title, metadataURI, token, passingScore, prize);
+                    showMessage("Creating campaign... waiting for transaction to be mined.", false);
+                    await tx.wait();
+                    showMessage("Campaign created successfully! Refreshing list...", false);
+                    await refreshCampaigns();
+                } catch (err) {
+                    showMessage("Campaign creation failed. See console for details.", true);
+                    console.error("Create campaign transaction failed:", err);
+                }
+            });
+
+            async function refreshCampaigns() {
+                try {
+                    if (!factoryAddress) return;
+                    
+                    const signerOrProvider = signer || provider;
+                    const factory = new ethers.Contract(factoryAddress, factoryAbi, signerOrProvider);
+                    const campaigns = await factory.getCampaigns();
+                    const listEl = document.getElementById("campaignList");
+                    listEl.innerHTML = "";
+                    
+                    if (campaigns.length === 0) {
+                        listEl.innerHTML = `<div class="text-center text-slate-500 py-4">No campaigns found. Create one above!</div>`;
+                    }
+
+                    for (let addr of campaigns) {
+                        const campaignCard = document.createElement("div");
+                        campaignCard.className = "campaignCard flex flex-col sm:flex-row justify-between items-center p-4 card rounded-xl transition duration-150 ease-in-out cursor-pointer hover:ring-2 hover:ring-indigo-500";
+                        
+                        const addrEl = document.createElement("span");
+                        addrEl.textContent = short(addr);
+                        addrEl.className = "font-mono text-sm mb-2 sm:mb-0 text-indigo-300";
+                        campaignCard.appendChild(addrEl);
+                        
+                        const btn = document.createElement("button");
+                        btn.textContent = "Open Quiz";
+                        btn.className = "btn-secondary py-2 px-4";
+                        btn.onclick = (e) => {
+                            e.stopPropagation(); 
+                            openCampaign(addr);
+                        };
+                        campaignCard.appendChild(btn);
+                        listEl.appendChild(campaignCard);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById("campaignList").innerHTML = `<div class="p-4 text-red-400">Error loading campaigns. Check network and contract deployment.</div>`;
+                }
+            }
+
+            async function openCampaign(addr) {
+                document.getElementById("campaignDetail").style.display = "block";
+                document.getElementById("questionArea").innerHTML = `<div class="text-center text-gray-400">Fetching campaign details...</div>`;
+                
+                try {
+                    const signerOrProvider = signer || provider;
+                    const campaign = new ethers.Contract(addr, campaignAbi, signerOrProvider);
+                    
+                    const [metaURI, token, prize, balance] = await Promise.all([
+                        campaign.metadataURI(),
+                        campaign.token(),
+                        campaign.prizePerWinner(),
+                        campaign.getBalance()
+                    ]);
+
+                    document.getElementById("campTitle").textContent = `Campaign: ${short(addr)}`;
+                    document.getElementById("campMeta").innerHTML = `
+                        <div class="text-base text-white">Prize Pool: <span class="font-bold">${ethers.formatEther(balance)}</span> ${token === ethers.ZeroAddress ? "ETH" : short(token)}</div>
+                        <div class="text-sm text-slate-300">Prize per winner: ${ethers.formatEther(prize)} ${token === ethers.ZeroAddress ? "ETH" : short(token)}</div>
+                        <div class="text-sm text-slate-500 truncate">Metadata URI: <a href="${metaURI}" target="_blank" class="text-indigo-400 hover:text-indigo-300">${metaURI}</a></div>
+                    `;
+                    
+                    // Fetch questions JSON
+                    const resp = await fetch(metaURI);
+                    const json = await resp.json();
+                    renderQuiz(addr, json);
+                } catch (err) {
+                    console.error(err);
+                    document.getElementById("questionArea").innerHTML = `<div class="text-red-400">Failed to load campaign data or metadata: ${err.message || 'Check console.'}</div>`;
+                }
+            }
+
+            function renderQuiz(campaignAddr, meta) {
+                const area = document.getElementById("questionArea");
+                const actionsArea = document.getElementById("quizActions");
+                area.innerHTML = "";
+                actionsArea.innerHTML = "";
+
+                const form = document.createElement("form");
+                form.id = "quizForm";
+                
+                // Add note about scoring/claim process
+                const note = document.createElement("p");
+                note.className = "text-sm text-yellow-400 mb-4 p-3 bg-slate-700 rounded-lg";
+                note.textContent = "NOTE: This demo requires the correct answers string (e.g., Q1:A|Q2:B) for claiming. You will be prompted for it after clicking 'Claim Reward'.";
+                area.appendChild(note);
+
+
+                meta.questions.forEach((q, i) => {
+                    const qDiv = document.createElement("div");
+                    qDiv.className = "question p-3 border border-slate-700 rounded-lg mb-3";
+                    
+                    const qTitle = document.createElement("p");
+                    qTitle.className = "font-semibold mb-2 text-white";
+                    qTitle.innerHTML = `Q${i + 1}: ${q.question}`;
+                    qDiv.appendChild(qTitle);
+
+                    q.options.forEach((opt, idx) => {
+                        const uniqueId = `q${i}_${idx}_${campaignAddr}`;
+                        
+                        // Input field (hidden by CSS)
+                        const input = document.createElement("input");
+                        input.type = "radio";
+                        input.name = `q${i}`;
+                        input.value = String.fromCharCode(65 + idx); // A, B, C...
+                        input.id = uniqueId;
+                        
+                        // Styled label
+                        const label = document.createElement("label");
+                        label.className = "option-label";
+                        label.setAttribute('for', uniqueId);
+                        
+                        // Label content
+                        label.innerHTML = `<span class="mr-2 font-mono text-indigo-300">${String.fromCharCode(65 + idx)}:</span> ${opt}`;
+                        
+                        qDiv.appendChild(input); 
+                        qDiv.appendChild(label);
+                    });
+                    form.appendChild(qDiv);
+                });
+
+                const claimButton = document.createElement("button");
+                claimButton.type = "button";
+                claimButton.textContent = "Claim Reward";
+                claimButton.className = "btn-primary w-full";
+                
+                claimButton.onclick = async () => {
+                    if (!signer) return showMessage("Connect wallet to claim", true);
+
+                    // Step 1: Get correct answers string for hashing (simulating off-chain validation)
+                    const answers = await customPrompt(
+                        "Enter Correct Answers String", 
+                        "Enter the correct answers string (for keccak256 hash). Format: Q1:A|Q2:C|Q3:B. This simulates a passing score.", 
+                        meta.answersExampleFormat || "Q1:A|Q2:B"
+                    );
+                    if (!answers) return showMessage("Claim cancelled.", true);
+                    
+                    // Step 2: Compute hash
+                    const hash = ethers.keccak256(ethers.toUtf8Bytes(answers));
+                    
+                    // Step 3: Choose claim mode
+                    const mode = await customPrompt(
+                        "Select Claim Mode", 
+                        "Choose 'A' for on-chain Answers Hash, or 'B' for Admin-Signed Signature (recommended for production).", 
+                        "B"
+                    );
+                    if (!mode) return showMessage("Claim cancelled.", true);
+
+                    const signerContract = new ethers.Contract(campaignAddr, campaignAbi, signer);
+
+                    try {
+                        let tx;
+                        if (mode.toUpperCase() === "A") {
+                            // Option A: claimWithAnswersHash
+                            showMessage("Claiming via Answers Hash (Option A)... Please confirm transaction.", false);
+                            tx = await signerContract.claimWithAnswersHash(hash);
+                        } else if (mode.toUpperCase() === "B") {
+                            // Option B: claimWithSignature (requires off-chain admin signing)
+                            const signature = await customPrompt(
+                                "Paste Admin Signature", 
+                                "Paste the admin-signed signature for your address and this campaign. (The admin must sign the hash of your address and the campaign address).",
+                                ""
+                            );
+                            if (!signature) return showMessage("Signature required for Option B. Claim cancelled.", true);
+                            showMessage("Claiming via Admin Signature (Option B)... Please confirm transaction.", false);
+                            tx = await signerContract.claimWithSignature(signature);
+                        } else {
+                            return showMessage("Invalid mode selected. Claim cancelled.", true);
+                        }
+
+                        showMessage("Transaction sent, waiting for confirmation...", false);
+                        await tx.wait();
+                        showMessage("Claim transaction mined successfully! Check your wallet for the reward.", false);
+                        
+                    } catch (err) {
+                        const errorMsg = err?.reason || err?.data?.message || err?.message || 'An unknown error occurred.';
+                        showMessage(`Claim failed: ${errorMsg}`, true);
+                        console.error("Claim transaction failed:", err);
+                    }
+                };
+                
+                area.appendChild(form);
+                actionsArea.appendChild(claimButton);
+            }
+
+            // Initial attempt to refresh campaigns (factory must be configured)
+            await refreshCampaigns();
+        })();
+    </script>
 </body>
 </html>
+
